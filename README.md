@@ -39,3 +39,11 @@ TanStack Query handles mock document queries, upload mutation/cache invalidation
 Vercel: root directory `frontend`, framework Vite, install `npm ci`, build `npm run build`, output `dist`. `vercel.json` includes SPA history fallback for direct route access.
 
 Planned backend: separate service, Aiven PostgreSQL, document storage and WorkBuddy MCP integration. No paid backend resources provisioned by this prototype.
+
+## Product help panel
+
+The global `ProductAssistant` lives outside route elements so navigation never unmounts it. A fixed launcher and panel appear on every route. Open/closed state, the current draft, and the latest 60 messages persist in localStorage (`opscore-product-assistant-v1`). If storage is unavailable, in-memory navigation still works. Escape closes the panel; the trash button resets its conversation. The panel is non-modal, so other page links remain usable.
+
+Answers come from a small local product FAQ, **not ChatGPT or a generative model**. Unsupported questions explicitly say the FAQ cannot answer. No chatbot messages are sent to an AI provider. ChatGPT Go does not include API usage; eligible ChatGPT-plan integrations require separate official support that OpsCore does not currently have. Do not put subscription session tokens or API keys in this frontend.
+
+The landing footer uses real app routes and existing landing anchors. There are no placeholder legal links or invented business contact details.
