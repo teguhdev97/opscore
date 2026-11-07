@@ -1,0 +1,19 @@
+.account-dropdown{position:relative;display:flex;align-items:center}
+.account-trigger{display:grid;place-items:center;padding:4px;border-radius:50%;min-width:40px;min-height:40px}.account-trigger:hover,.account-trigger[aria-expanded=true]{background:#edf1ff}.account-trigger .user-avatar{margin:0}
+.account-panel{position:absolute;right:0;top:calc(100% + 8px);z-index:100;width:300px;max-width:calc(100vw - 32px);max-height:calc(100dvh - 100px);overflow:auto;padding:16px 6px 6px;border:1px solid #e2e7f0;border-radius:14px;background:#fff;color:#1b263d;box-shadow:0 16px 48px #1b263d24;animation:account-appear .15s ease-out}
+.account-summary{display:flex;gap:12px;align-items:center;padding:0 12px}.account-summary>div{min-width:0}.account-summary strong{display:block;font-size:15px;overflow-wrap:anywhere}.account-summary span:not(.account-avatar){display:block;font-size:12px;color:#7d879a;margin-top:3px;overflow-wrap:anywhere}
+.account-avatar{display:inline-grid;place-items:center;flex:none;width:38px;height:38px;border-radius:11px;background:#3456e8;color:white;font-size:17px;font-weight:700}
+.account-role{padding:0 12px;margin:12px 0;font-size:12px;color:inherit}.account-role span{color:#7d879a}
+.account-group{border-top:1px solid #e9edf3;padding:6px 0}.account-group a,.account-group button,.account-options label{display:flex;align-items:center;gap:10px;width:100%;padding:8px 12px;font-size:14px;text-align:left;border-radius:8px;color:inherit;cursor:pointer}.account-group a:hover,.account-group button:hover,.account-options label:hover{background:#f3f6fc}.account-group svg,.account-options svg{color:#7d879a}
+.account-options{border:0;margin:0;padding:4px 0}.account-options:first-of-type{border-top:1px solid #e9edf3}.account-options legend{display:flex;align-items:center;gap:8px;padding:6px 12px 2px;font-size:12px;color:#7d879a}.account-options input{appearance:none;width:12px;height:12px;margin:0 7px 0 2px;border:1px solid transparent;border-radius:50%;flex:none}.account-options input:checked{background:#3456e8;border-color:#3456e8}.account-options label:focus-within{outline:2px solid #95adff;outline-offset:-2px}
+.account-exit button,.account-exit svg{color:#c04444}.account-page{max-width:680px;padding:28px}.account-page dl{display:grid;gap:8px;margin:24px 0}.account-page dt{color:#7d879a;font-size:12px}.account-page dd{margin:0 0 12px;overflow-wrap:anywhere}
+@keyframes account-appear{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.account-panel{animation:none}}
+html[data-theme=dark]{color-scheme:dark;background:#111827;color:#e5eaf4;--muted:#a0aec3;--border:#344158}
+html[data-theme=dark] .app-shell,html[data-theme=dark] .workspace-main{background:#111827;color:#e5eaf4}
+html[data-theme=dark] :is(.sidebar,.topbar,.panel,.account-panel,.notification-panel,.workspace-switch,.workspace-avatar,.document-table,.settings-panel input,.settings-panel select){background:#1b263d;color:#e5eaf4;border-color:#344158}
+html[data-theme=dark] :is(.account-group,.account-options:first-of-type){border-color:#344158}
+html[data-theme=dark] :is(.account-group a:hover,.account-group button:hover,.account-options label:hover,.account-trigger:hover,.workspace-tip,.outline){background:#293954;color:#e5eaf4}
+html[data-theme=dark] :is(.account-summary span:not(.account-avatar),.account-role span,.account-options legend,.account-group svg,.account-options svg){color:#a0aec3}
+html[data-theme=dark] :is(.sidebar nav a.active,.sidebar nav a:hover,.user:hover){background:#293954;color:#b6c4ff}
+html[data-theme=dark] .account-exit button,html[data-theme=dark] .account-exit svg{color:#ff9898}

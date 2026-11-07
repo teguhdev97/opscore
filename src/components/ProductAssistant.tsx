@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { chatApiUrl, requestProductReply } from '../lib/product-chat';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, MessageCircle, Send, Sparkles, Trash2, X } from 'lucide-react';
+import { ArrowUpRight, ChevronUp, MessageCircle, Send, Sparkles, Trash2, X } from 'lucide-react';
 import './product-assistant.css';
 
 type Message = { role: 'user' | 'assistant'; text: string; link?: string; label?: string; source?: 'ai' | 'faq' };
@@ -41,6 +41,7 @@ function loadState(): ChatState {
 export function ProductAssistant() {
   const [state, setState] = useState<ChatState>(loadState);
   const [storageAvailable, setStorageAvailable] = useState(true);
+  const [showScroll, setShowScroll] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
   const request = useRef<AbortController | null>(null);
@@ -64,6 +65,12 @@ export function ProductAssistant() {
   }, [state]);
   useEffect(() => () => request.current?.abort(), []);
   useEffect(() => { if (state.open) input.current?.focus(); }, [state.open]);
+  useEffect(() => {
+    const handleScroll = () => setShowScroll(window.scrollY >= Math.max(window.innerHeight, 600));
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   useEffect(() => { if (messages.current) messages.current.scrollTop = messages.current.scrollHeight; }, [state.messages, state.open, pending, error]);
   function close() { setState(s => ({ ...s, open: false })); launcher.current?.focus(); }
   function clear() {
@@ -119,6 +126,7 @@ export function ProductAssistant() {
         <small>{aiReady ? 'Saat dikirim, pesan dan riwayat terbatas diteruskan ke provider AI. Jangan bagikan informasi rahasia.' : 'FAQ lokal, bukan AI generatif. Pesan baru tidak dikirim ke provider AI.'} {storageAvailable ? 'Riwayat tersimpan di browser ini.' : 'Riwayat hanya untuk sesi ini.'}</small>
       </form>
     </section>}
+    {showScroll && <button className="product-chat-scroll-top" aria-label="Kembali ke atas" onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })}><ChevronUp size={20} strokeWidth={2.25}/></button>}
     <button ref={launcher} className="product-chat-launcher" aria-expanded={state.open} aria-controls="product-chat-panel" onClick={() => state.open ? close() : setState(s => ({ ...s, open: true }))}>
       <span>{state.open ? <X size={23}/> : <MessageCircle size={23}/>}</span>Tanya OpsCore
     </button>
