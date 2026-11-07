@@ -14,7 +14,21 @@ npm ci
 npm run dev
 ```
 
-Copy `.env.example` to `.env.local` and set the public API URL when the backend is ready.
+Copy `.env.example` to `.env.local`. For the deployed backend, use:
+
+```env
+VITE_API_BASE_URL=https://server-opscore.teguhharits.com/api/v1
+```
+
+For local backend development, use:
+
+```env
+VITE_API_BASE_URL=http://localhost:3000/api/v1
+```
+
+Set the same `VITE_API_BASE_URL` in the Vercel project under
+**Settings > Environment Variables**, then redeploy. Only public URLs belong
+in frontend environment variables; never add database credentials or tokens.
 
 ## Deploy to Vercel
 
