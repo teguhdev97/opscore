@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { chatApiUrl, requestProductReply } from '../lib/product-chat';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, MessageCircle, Send, Sparkles, Trash2, X } from 'lucide-react';
 import './product-assistant.css';
 
-type Message = { role: 'user' | 'assistant'; text: string; link?: string; label?: string };
+type Message = { role: 'user' | 'assistant'; text: string; link?: string; label?: string; source?: 'ai' | 'faq' };
 type ChatState = { open: boolean; messages: Message[]; draft: string };
 const storageKey = 'opscore-product-assistant-v1';
 const welcome: Message = { role: 'assistant', text: 'Halo, saya asisten OpsCore. Saya bisa membantu mengenali fitur, menjelaskan alur demo, dan menunjukkan tempat mulai. Apa yang ingin kamu ketahui?' };
@@ -30,7 +32,7 @@ function loadState(): ChatState {
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
     if (saved && typeof saved.open === 'boolean' && Array.isArray(saved.messages)) {
-      const messages: Message[] = saved.messages.filter((m: Message) => m && ['user', 'assistant'].includes(m.role) && typeof m.text === 'string').slice(-60).map((m: Message) => ({ role: m.role, text: m.text, ...(typeof m.link === 'string' && /^\/app(?:\/|$)/.test(m.link) ? { link: m.link, label: m.label } : {}) }));
+      const messages: Message[] = saved.messages.filter((m: Message) => m && ['user', 'assistant'].includes(m.role) && typeof m.text === 'string').slice(-60).map((m: Message) => ({ role: m.role, text: m.text, source: m.source === 'ai' ? 'ai' : 'faq', ...(typeof m.link === 'string' && /^\/app(?:\/|$)/.test(m.link) ? { link: m.link, label: m.label } : {}) }));
       return { open: saved.open, messages: messages.length ? messages : [welcome], draft: typeof saved.draft === 'string' ? saved.draft.slice(0, 1000) : '' };
     }
   } catch { /* Storage may be unavailable or from an older version. */ }
@@ -39,6 +41,20 @@ function loadState(): ChatState {
 export function ProductAssistant() {
   const [state, setState] = useState<ChatState>(loadState);
   const [storageAvailable, setStorageAvailable] = useState(true);
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState('');
+  const request = useRef<AbortController | null>(null);
+  const lastQuestion = useRef('');
+  const status = useQuery({
+    queryKey: ['product-chat-status', chatApiUrl], enabled: Boolean(chatApiUrl) && state.open,
+    queryFn: async ({ signal }) => {
+      const response = await fetch(`${chatApiUrl}/api/chat/status`, { signal });
+      if (!response.ok) throw new Error('Backend unavailable');
+      const data = await response.json();
+      return data.configured === true;
+    }, retry: false, staleTime: 30000,
+  });
+  const aiReady = Boolean(chatApiUrl) && status.data === true && !status.isError;
   const input = useRef<HTMLInputElement>(null);
   const launcher = useRef<HTMLButtonElement>(null);
   const messages = useRef<HTMLDivElement>(null);
@@ -46,30 +62,61 @@ export function ProductAssistant() {
     try { localStorage.setItem(storageKey, JSON.stringify(state)); }
     catch { setStorageAvailable(false); }
   }, [state]);
+  useEffect(() => () => request.current?.abort(), []);
   useEffect(() => { if (state.open) input.current?.focus(); }, [state.open]);
-  useEffect(() => { if (messages.current) messages.current.scrollTop = messages.current.scrollHeight; }, [state.messages, state.open]);
+  useEffect(() => { if (messages.current) messages.current.scrollTop = messages.current.scrollHeight; }, [state.messages, state.open, pending, error]);
   function close() { setState(s => ({ ...s, open: false })); launcher.current?.focus(); }
-  function send(question = state.draft) {
+  function clear() {
+    request.current?.abort(); request.current = null;
+    setPending(false); setError(''); lastQuestion.current = '';
+    setState(s => ({ ...s, messages: [welcome], draft: '' }));
+  }
+  async function send(question = state.draft, retry = false) {
     const text = question.trim().slice(0, 1000);
-    if (!text) return;
-    setState(s => ({ ...s, draft: '', messages: [...s.messages, { role: 'user' as const, text }, answer(text)].slice(-60) }));
+    if (!text || request.current) return;
+    const next = retry ? state.messages : [...state.messages, { role: 'user' as const, text }];
+    lastQuestion.current = text; setError('');
+    setState(s => ({ ...s, draft: '', messages: next.slice(-60) }));
+    if (!aiReady) {
+      setState(s => ({ ...s, messages: [...s.messages, { ...answer(text), source: 'faq' as const }].slice(-60) }));
+      return;
+    }
+    const controller = new AbortController(); request.current = controller;
+    setPending(true);
+    const timeout = window.setTimeout(() => controller.abort(), 30000);
+    try {
+      const history = next.filter(m => m.role === 'user' || m.source === 'ai');
+      const reply = await requestProductReply(history, controller.signal);
+      if (request.current === controller) setState(s => ({ ...s, messages: [...s.messages, { role: 'assistant' as const, text: reply, source: 'ai' as const }].slice(-60) }));
+    } catch (reason) {
+      if (request.current === controller) setError(controller.signal.aborted ? 'Waktu tunggu habis. Coba lagi atau gunakan FAQ.' : reason instanceof Error ? reason.message : 'AI belum dapat menjawab.');
+    } finally {
+      window.clearTimeout(timeout);
+      if (request.current === controller) { request.current = null; setPending(false); }
+    }
+  }
+  function useFaq() {
+    setState(s => ({ ...s, messages: [...s.messages, { ...answer(lastQuestion.current), source: 'faq' as const }].slice(-60) }));
+    setError('');
   }
   return <div className="product-chat">
     {state.open && <section id="product-chat-panel" className="product-chat-panel" role="dialog" aria-modal="false" aria-labelledby="product-chat-title" onKeyDown={e => { if (e.key === 'Escape') close(); }}>
       <header className="product-chat-header">
         <span className="product-chat-avatar"><Sparkles size={23}/><i/></span>
-        <div><h2 id="product-chat-title">Tanya OpsCore</h2><span>Panduan produk · FAQ</span></div>
-        <button aria-label="Hapus percakapan" title="Hapus percakapan" onClick={() => setState(s => ({ ...s, messages: [welcome], draft: '' }))}><Trash2 size={18}/></button>
+        <div><h2 id="product-chat-title">Tanya OpsCore</h2><span>Panduan produk · {aiReady ? 'AI' : 'FAQ'}</span></div>
+        <button aria-label="Hapus percakapan" title="Hapus percakapan" onClick={clear}><Trash2 size={18}/></button>
         <button aria-label="Tutup chatbot" onClick={close}><X size={21}/></button>
       </header>
-      <div className="product-chat-mode"><span/> FAQ produk aktif · Belum terhubung ke ChatGPT</div>
+      <div className="product-chat-mode"><span/> {aiReady ? 'AI produk · Pengetahuan OpsCore' : status.isFetching ? 'Memeriksa koneksi · FAQ tersedia' : 'FAQ lokal · AI belum terhubung'}</div>
       <div className="product-chat-messages" ref={messages} role="log" aria-live="polite" aria-label="Percakapan bantuan produk">
-        {state.messages.map((message, index) => <div key={index} className={'product-chat-message ' + message.role}><p>{message.text}</p>{message.link && <Link to={message.link}>{message.label}<ArrowUpRight size={14}/></Link>}</div>)}
+        {state.messages.map((message, index) => <div key={index} className={'product-chat-message ' + message.role}><p>{message.text}</p>{message.role === 'assistant' && message.source && <small className="product-chat-source">{message.source === 'ai' ? 'Jawaban AI · Periksa kembali informasi penting' : 'FAQ produk'}</small>}{message.link && <Link to={message.link}>{message.label}<ArrowUpRight size={14}/></Link>}</div>)}
+        {pending && <div className="product-chat-message assistant" role="status"><p>OpsCore sedang menjawab…</p></div>}
+        {error && <div className="product-chat-error" role="alert"><p>{error}</p><button onClick={() => send(lastQuestion.current, true)}>Coba lagi</button><button onClick={useFaq}>Gunakan FAQ</button></div>}
         {state.messages.length === 1 && <div className="product-chat-prompts">{['Bagaimana cara mulai?', 'Apa fitur OpsCore?', 'Apakah sudah memakai AI?'].map(q => <button key={q} onClick={() => send(q)}>{q}<ArrowUpRight size={13}/></button>)}</div>}
       </div>
       <form className="product-chat-compose" onSubmit={e => { e.preventDefault(); send(); }}>
-        <div><input ref={input} aria-label="Pertanyaan tentang OpsCore" placeholder="Tanya tentang OpsCore…" maxLength={1000} value={state.draft} onChange={e => setState(s => ({ ...s, draft: e.target.value }))}/><button type="submit" aria-label="Kirim pertanyaan" disabled={!state.draft.trim()}><Send size={20}/></button></div>
-        <small>{storageAvailable ? 'FAQ, bukan AI generatif. Riwayat tersimpan di browser ini.' : 'Penyimpanan browser tidak tersedia. Riwayat hanya untuk sesi ini.'}</small>
+        <div><input ref={input} aria-label="Pertanyaan tentang OpsCore" placeholder="Tanya tentang OpsCore…" maxLength={1000} value={state.draft} onChange={e => setState(s => ({ ...s, draft: e.target.value }))}/><button type="submit" aria-label="Kirim pertanyaan" disabled={!state.draft.trim() || pending || Boolean(error)}><Send size={20}/></button></div>
+        <small>{aiReady ? 'Saat dikirim, pesan dan riwayat terbatas diteruskan ke provider AI. Jangan bagikan informasi rahasia.' : 'FAQ lokal, bukan AI generatif. Pesan baru tidak dikirim ke provider AI.'} {storageAvailable ? 'Riwayat tersimpan di browser ini.' : 'Riwayat hanya untuk sesi ini.'}</small>
       </form>
     </section>}
     <button ref={launcher} className="product-chat-launcher" aria-expanded={state.open} aria-controls="product-chat-panel" onClick={() => state.open ? close() : setState(s => ({ ...s, open: true }))}>

@@ -1,0 +1,10 @@
+{
+  "name": "opscore-backend",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/server.mjs",
+    "test": "node --test"
+  }
+}
