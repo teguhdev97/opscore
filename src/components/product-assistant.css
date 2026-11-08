@@ -29,7 +29,7 @@
 
 .product-chat-profile-backdrop{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:24px;background:#09152dcc;backdrop-filter:blur(7px)}
 .product-chat-profile-view{position:relative;width:min(960px,calc(100vw - 32px));max-height:calc(100dvh - 48px);display:flex;flex-direction:column;overflow:hidden;border:1px solid #ffffff55;border-radius:22px;background:#0d1830;box-shadow:0 28px 90px #06102c88}
-.product-chat-profile-image{display:block;width:100%;height:auto;max-height:calc(100dvh - 150px);object-fit:contain;background:#eaf1ff}
+.product-chat-profile-image{display:block;width:min(520px,100%);height:auto;max-height:calc(100dvh - 150px);object-fit:contain;align-self:center;background:#eaf1ff}
 .product-chat-profile-close{position:absolute;top:14px;right:14px;z-index:2;width:42px;height:42px;display:grid;place-items:center;border:1px solid #ffffff55;border-radius:50%;background:#18233caa;color:#fff;backdrop-filter:blur(8px)}
 .product-chat-profile-close:hover{background:#18233cee}
 .product-chat-profile-footer{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 20px;color:#fff;background:#0d1830}
