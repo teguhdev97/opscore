@@ -1,8 +1,8 @@
-# Opscore Frontend
+# DokuresAI Frontend
 
-Frontend web application for **Opscore**, built for the hackathon.
+Frontend web application for **DokuresAI**, built for the hackathon.
 
-- **Live app:** https://opscore-xi.vercel.app/
+- **Live app:** https://opscore-xi.vercel.app/ (deployment URL retained)
 - **Stack:** React 19, TypeScript, Vite, and Vercel
 - **Backend API:** maintained separately at https://gitlab.com/teguhdev/backend-opscore
 - **Database:** Aiven PostgreSQL (accessed only through the backend)
