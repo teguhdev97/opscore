@@ -8,25 +8,25 @@ import './product-assistant.css';
 type Message = { role: 'user' | 'assistant'; text: string; link?: string; label?: string; source?: 'ai' | 'faq' };
 type ChatState = { open: boolean; messages: Message[]; draft: string };
 const storageKey = 'opscore-product-assistant-v1';
-const welcome: Message = { role: 'assistant', text: 'Halo, saya asisten OpsCore. Saya bisa membantu mengenali fitur, menjelaskan alur demo, dan menunjukkan tempat mulai. Apa yang ingin kamu ketahui?' };
+const welcome: Message = { role: 'assistant', text: 'Halo, saya asisten DokuresAI. Saya bisa membantu mengenali fitur, menjelaskan alur demo, dan menunjukkan tempat mulai. Apa yang ingin kamu ketahui?' };
 const topics = [
-  { keywords: /chatgpt|openai|\bgo\b|api|model/i, text: 'Panel ini menggunakan FAQ produk OpsCore, belum terhubung ke ChatGPT. Langganan ChatGPT Go tidak mencakup penggunaan API. Integrasi penggunaan paket ChatGPT memerlukan dukungan resmi yang belum tersedia di OpsCore.', link: '/app/settings', label: 'Lihat status integrasi' },
-  { keywords: /harga|biaya|bayar|gratis|pricing|paket/i, text: 'Demo OpsCore dapat dijelajahi tanpa pendaftaran. Harga paket produk belum ditetapkan. Fitur backend dan AI belum aktif pada prototype ini.', link: '/app', label: 'Jelajahi demo' },
+  { keywords: /chatgpt|openai|\bgo\b|api|model/i, text: 'Panel ini menggunakan FAQ produk DokuresAI, belum terhubung ke ChatGPT. Langganan ChatGPT Go tidak mencakup penggunaan API. Integrasi penggunaan paket ChatGPT memerlukan dukungan resmi yang belum tersedia di DokuresAI.', link: '/app/settings', label: 'Lihat status integrasi' },
+  { keywords: /harga|biaya|bayar|gratis|pricing|paket/i, text: 'Demo DokuresAI dapat dijelajahi tanpa pendaftaran. Harga paket produk belum ditetapkan. Fitur backend dan AI belum aktif pada prototype ini.', link: '/app', label: 'Jelajahi demo' },
   { keywords: /upload|unggah|pdf|dokumen|knowledge|sop/i, text: 'Knowledge Base adalah tempat untuk mencari dan melihat dokumen contoh. Klik Upload dokumen untuk mencoba alurnya. Saat ini upload hanya simulasi: PDF belum disimpan di server, dibaca, atau diindeks oleh AI.', link: '/app/knowledge', label: 'Buka Knowledge Base' },
   { keywords: /checklist|inspeksi|centang|action/i, text: 'Di Checklists, kamu dapat mencoba mencentang langkah inspeksi. Progres demo disimpan di browser yang sama. Pembuatan checklist otomatis dari SOP dan persetujuan oleh Safety Lead masih dalam rencana pengembangan.', link: '/app/checklists', label: 'Coba checklist' },
   { keywords: /rag|sitasi|citation|jawaban|assistant|asisten|\bai\b/i, text: 'AI Assistant memperagakan tanya jawab dengan referensi dokumen. Jawaban di halaman itu masih contoh, bukan hasil pembacaan PDF kamu. Versi yang direncanakan akan mencari potongan SOP dan menyertakan nama file serta nomor halaman.', link: '/app/assistant', label: 'Buka demo AI Assistant' },
   { keywords: /compliance|kepatuhan|audit|activity|aktivitas|laporan/i, text: 'Compliance dan Activity Log menampilkan contoh pemantauan tinjauan dokumen serta aktivitas tim. Angka dan catatannya masih data ilustrasi; belum menjadi bukti kepatuhan atau hasil audit nyata.', link: '/app/compliance', label: 'Lihat demo Compliance' },
-  { keywords: /aiven|database|backend|tencent|workbuddy|integrasi|storage/i, text: 'Rencana OpsCore memakai Aiven PostgreSQL untuk data, Tencent Cloud untuk layanan aplikasi dan penyimpanan, serta WorkBuddy melalui MCP. Prototype yang kamu lihat belum terhubung ke layanan tersebut.', link: '/app/settings', label: 'Lihat pengaturan' },
+  { keywords: /aiven|database|backend|tencent|workbuddy|integrasi|storage/i, text: 'Rencana DokuresAI memakai Aiven PostgreSQL untuk data, Tencent Cloud untuk layanan aplikasi dan penyimpanan, serta WorkBuddy melalui MCP. Prototype yang kamu lihat belum terhubung ke layanan tersebut.', link: '/app/settings', label: 'Lihat pengaturan' },
   { keywords: /login|register|daftar|akun|admin|operator|teknisi|role/i, text: 'Demo ini belum memakai login sungguhan. Profil dan workspace yang terlihat adalah contoh. Versi produk direncanakan membedakan Admin, Safety Lead, dan Operator agar dokumen serta inspeksi bisa dikelola sesuai peran.', link: '/app', label: 'Masuk workspace demo' },
   { keywords: /privasi|privacy|cookie|data|aman|hapus|simpan/i, text: 'Percakapan FAQ, status panel, dan beberapa progres demo disimpan di localStorage browser ini. Panel FAQ tidak mengirim pesan ke server AI. Tombol hapus di atas menghapus percakapan panel. Jangan masukkan dokumen atau informasi rahasia ke prototype.', link: '/app/settings', label: 'Lihat pengaturan demo' },
   { keywords: /mulai|cara|alur|flow|pakai|gunakan|demo|fitur/i, text: 'Mulai dari Knowledge Base untuk melihat SOP contoh, lalu coba AI Assistant, kemudian buka Checklists dan centang langkah inspeksi. Overview memberi ringkasan tampilan. Semua ini demo interaktif; pemrosesan PDF dan AI sungguhan belum aktif.', link: '/app/knowledge', label: 'Mulai dari Knowledge Base' },
-  { keywords: /opscore|produk|apa|manfaat|untuk|tentang/i, text: 'OpsCore adalah prototype workspace pengetahuan dan operasional untuk tim manufaktur. Tujuannya menyatukan SOP, membantu mencari jawaban bersumber, dan mengubah prosedur menjadi checklist inspeksi. Saat ini yang tersedia adalah frontend demo.', link: '/app', label: 'Jelajahi OpsCore' },
+  { keywords: /opscore|produk|apa|manfaat|untuk|tentang/i, text: 'DokuresAI adalah prototype workspace pengetahuan dan operasional untuk tim manufaktur. Tujuannya menyatukan SOP, membantu mencari jawaban bersumber, dan mengubah prosedur menjadi checklist inspeksi. Saat ini yang tersedia adalah frontend demo.', link: '/app', label: 'Jelajahi DokuresAI' },
 ];
 function answer(question: string): Message {
   if (/^(halo|hai|hi|hello|pagi|siang|sore|malam)[!.,\s]*$/i.test(question)) return welcome;
-  if (/^(makasih|terima kasih|thanks)[!.,\s]*$/i.test(question)) return { role: 'assistant', text: 'Sama-sama! Kamu bisa bertanya tentang fitur, alur demo, atau status pengembangan OpsCore.' };
+  if (/^(makasih|terima kasih|thanks)[!.,\s]*$/i.test(question)) return { role: 'assistant', text: 'Sama-sama! Kamu bisa bertanya tentang fitur, alur demo, atau status pengembangan DokuresAI.' };
   const topic = topics.find(({ keywords }) => keywords.test(question));
-  return topic ? { role: 'assistant', text: topic.text, link: topic.link, label: topic.label } : { role: 'assistant', text: 'Informasi itu belum ada di FAQ OpsCore. Saya belum menggunakan model AI dan tidak bisa menafsirkan semua pertanyaan. Coba tanyakan cara mulai, upload SOP, checklist, atau harga produk.' };
+  return topic ? { role: 'assistant', text: topic.text, link: topic.link, label: topic.label } : { role: 'assistant', text: 'Informasi itu belum ada di FAQ DokuresAI. Saya belum menggunakan model AI dan tidak bisa menafsirkan semua pertanyaan. Coba tanyakan cara mulai, upload SOP, checklist, atau harga produk.' };
 }
 function loadState(): ChatState {
   try {
@@ -110,25 +110,25 @@ export function ProductAssistant() {
     {state.open && <section id="product-chat-panel" className="product-chat-panel" role="dialog" aria-modal="false" aria-labelledby="product-chat-title" onKeyDown={e => { if (e.key === 'Escape') close(); }}>
       <header className="product-chat-header">
         <span className="product-chat-avatar"><Sparkles size={23}/><i/></span>
-        <div><h2 id="product-chat-title">Tanya OpsCore</h2><span>Panduan produk · {aiReady ? 'AI' : 'FAQ'}</span></div>
+        <div><h2 id="product-chat-title">Tanya DokuresAI</h2><span>Panduan produk · {aiReady ? 'AI' : 'FAQ'}</span></div>
         <button aria-label="Hapus percakapan" title="Hapus percakapan" onClick={clear}><Trash2 size={18}/></button>
         <button aria-label="Tutup chatbot" onClick={close}><X size={21}/></button>
       </header>
-      <div className="product-chat-mode"><span/> {aiReady ? 'AI produk · Pengetahuan OpsCore' : status.isFetching ? 'Memeriksa koneksi · FAQ tersedia' : 'FAQ lokal · AI belum terhubung'}</div>
+      <div className="product-chat-mode"><span/> {aiReady ? 'AI produk · Pengetahuan DokuresAI' : status.isFetching ? 'Memeriksa koneksi · FAQ tersedia' : 'FAQ lokal · AI belum terhubung'}</div>
       <div className="product-chat-messages" ref={messages} role="log" aria-live="polite" aria-label="Percakapan bantuan produk">
         {state.messages.map((message, index) => <div key={index} className={'product-chat-message ' + message.role}><p>{message.text}</p>{message.role === 'assistant' && message.source && <small className="product-chat-source">{message.source === 'ai' ? 'Jawaban AI · Periksa kembali informasi penting' : 'FAQ produk'}</small>}{message.link && <Link to={message.link}>{message.label}<ArrowUpRight size={14}/></Link>}</div>)}
-        {pending && <div className="product-chat-message assistant" role="status"><p>OpsCore sedang menjawab…</p></div>}
+        {pending && <div className="product-chat-message assistant" role="status"><p>DokuresAI sedang menjawab…</p></div>}
         {error && <div className="product-chat-error" role="alert"><p>{error}</p><button onClick={() => send(lastQuestion.current, true)}>Coba lagi</button><button onClick={useFaq}>Gunakan FAQ</button></div>}
-        {state.messages.length === 1 && <div className="product-chat-prompts">{['Bagaimana cara mulai?', 'Apa fitur OpsCore?', 'Apakah sudah memakai AI?'].map(q => <button key={q} onClick={() => send(q)}>{q}<ArrowUpRight size={13}/></button>)}</div>}
+        {state.messages.length === 1 && <div className="product-chat-prompts">{['Bagaimana cara mulai?', 'Apa fitur DokuresAI?', 'Apakah sudah memakai AI?'].map(q => <button key={q} onClick={() => send(q)}>{q}<ArrowUpRight size={13}/></button>)}</div>}
       </div>
       <form className="product-chat-compose" onSubmit={e => { e.preventDefault(); send(); }}>
-        <div><input ref={input} aria-label="Pertanyaan tentang OpsCore" placeholder="Tanya tentang OpsCore…" maxLength={1000} value={state.draft} onChange={e => setState(s => ({ ...s, draft: e.target.value }))}/><button type="submit" aria-label="Kirim pertanyaan" disabled={!state.draft.trim() || pending || Boolean(error)}><Send size={20}/></button></div>
+        <div><input ref={input} aria-label="Pertanyaan tentang DokuresAI" placeholder="Tanya tentang DokuresAI…" maxLength={1000} value={state.draft} onChange={e => setState(s => ({ ...s, draft: e.target.value }))}/><button type="submit" aria-label="Kirim pertanyaan" disabled={!state.draft.trim() || pending || Boolean(error)}><Send size={20}/></button></div>
         <small>{aiReady ? 'Saat dikirim, pesan dan riwayat terbatas diteruskan ke provider AI. Jangan bagikan informasi rahasia.' : 'FAQ lokal, bukan AI generatif. Pesan baru tidak dikirim ke provider AI.'} {storageAvailable ? 'Riwayat tersimpan di browser ini.' : 'Riwayat hanya untuk sesi ini.'}</small>
       </form>
     </section>}
     {showScroll && <button className="product-chat-scroll-top" aria-label="Kembali ke atas" onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })}><ChevronUp size={20} strokeWidth={2.25}/></button>}
     <button ref={launcher} className="product-chat-launcher" aria-expanded={state.open} aria-controls="product-chat-panel" onClick={() => state.open ? close() : setState(s => ({ ...s, open: true }))}>
-      <span>{state.open ? <X size={23}/> : <MessageCircle size={23}/>}</span>Tanya OpsCore
+      <span>{state.open ? <X size={23}/> : <MessageCircle size={23}/>}</span>Tanya DokuresAI
     </button>
   </div>;
 }
