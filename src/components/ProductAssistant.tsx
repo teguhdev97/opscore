@@ -130,7 +130,7 @@ export function ProductAssistant() {
     {profileOpen && <div className="product-chat-profile-overlay" role="presentation" onClick={() => setProfileOpen(false)} onKeyDown={e => { if (e.key === 'Escape') setProfileOpen(false); }}>
       <section className="product-chat-profile-view" role="dialog" aria-modal="false" aria-labelledby="product-chat-profile-title" onClick={e => e.stopPropagation()}>
         <button type="button" className="product-chat-profile-close" aria-label="Tutup foto profil dan kembali ke chat" onClick={() => setProfileOpen(false)}><X size={22}/></button>
-        <img className="product-chat-profile-image" src="/novia-profile-panel.webp" alt="Novia melambaikan tangan di kantor DokuresAI"/>
+        <img className="product-chat-profile-image" src="/novia-profile-office.webp" alt="Novia melambaikan tangan di kantor DokuresAI"/>
         <div className="product-chat-profile-footer">
           <div><strong id="product-chat-profile-title">Novia</strong><span>Asisten AI DokuresAI</span><small><i/> Online</small></div>
           <button type="button" onClick={() => setProfileOpen(false)}>Kembali ke chat</button>
@@ -139,7 +139,8 @@ export function ProductAssistant() {
     </div>}
     {showScroll && <button className="product-chat-scroll-top" aria-label="Kembali ke atas" onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })}><ChevronUp size={20} strokeWidth={2.25}/></button>}
     <button ref={launcher} className="product-chat-launcher" aria-label={state.open ? 'Tutup chat Novia' : 'Tanya Novia'} aria-expanded={state.open} aria-controls="product-chat-panel" onClick={() => state.open ? close() : setState(s => ({ ...s, open: true }))}>
-      <span className="product-chat-launcher-avatar"><img src="/novia-avatar.webp" alt=""/><i aria-label="Online"/></span><span className="product-chat-launcher-label">Tanya Novia</span>
+      {state.open ? <span className="product-chat-launcher-close" aria-hidden="true"><X size={22}/></span> : <span className="product-chat-launcher-avatar"><img src="/novia-avatar.webp" alt=""/><i aria-label="Online"/></span>}
+      <span className="product-chat-launcher-label">Tanya Novia</span>
     </button>
   </div>;
 }
