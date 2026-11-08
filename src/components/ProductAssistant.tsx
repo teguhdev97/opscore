@@ -110,7 +110,7 @@ export function ProductAssistant() {
   return <div className="product-chat">
     {state.open && <section id="product-chat-panel" className="product-chat-panel" role="dialog" aria-modal="false" aria-labelledby="product-chat-title" onKeyDown={e => { if (e.key === 'Escape') { if (profileOpen) { setProfileOpen(false); e.stopPropagation(); } else close(); } }}>
       <header className="product-chat-header">
-        <button type="button" className="product-chat-avatar-button" aria-label="Lihat foto profil Novia" onClick={() => setProfileOpen(true)}><span className="product-chat-avatar"><img src="/novia-office.webp" alt=""/><i aria-label="Online"/></span></button>
+        <button type="button" className="product-chat-avatar-button" aria-label="Lihat foto profil Novia" onClick={() => setProfileOpen(true)}><span className="product-chat-avatar"><img src="/novia-avatar.webp" alt=""/><i aria-label="Online"/></span></button>
         <div><h2 id="product-chat-title">Novia</h2><span className="product-chat-presence"><i/>Asisten AI DokuresAI · Online</span></div>
         <button aria-label="Hapus percakapan" title="Hapus percakapan" onClick={clear}><Trash2 size={18}/></button>
         <button aria-label="Tutup chatbot" onClick={close}><X size={21}/></button>
@@ -130,7 +130,7 @@ export function ProductAssistant() {
     {profileOpen && <div className="product-chat-profile-backdrop" role="presentation" onClick={() => setProfileOpen(false)} onKeyDown={e => { if (e.key === 'Escape') setProfileOpen(false); }}>
       <section className="product-chat-profile-view" role="dialog" aria-modal="true" aria-labelledby="product-chat-profile-title" onClick={e => e.stopPropagation()}>
         <button type="button" className="product-chat-profile-close" aria-label="Tutup foto profil" onClick={() => setProfileOpen(false)}><X size={22}/></button>
-        <img className="product-chat-profile-image" src="/novia-office.webp" alt="Novia, asisten AI DokuresAI, menyapa dari kantor DokuresAI"/>
+        <img className="product-chat-profile-image" src="/novia-avatar.webp" alt="Novia, asisten AI DokuresAI, menyapa dari kantor DokuresAI"/>
         <div className="product-chat-profile-footer">
           <div><strong id="product-chat-profile-title">Novia</strong><span>Asisten AI DokuresAI</span><small><i/> Online</small></div>
           <button type="button" onClick={() => setProfileOpen(false)}>Kembali ke chat</button>
@@ -139,7 +139,7 @@ export function ProductAssistant() {
     </div>}
     {showScroll && <button className="product-chat-scroll-top" aria-label="Kembali ke atas" onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })}><ChevronUp size={20} strokeWidth={2.25}/></button>}
     <button ref={launcher} className="product-chat-launcher" aria-label={state.open ? 'Tutup chat Novia' : 'Tanya Novia'} aria-expanded={state.open} aria-controls="product-chat-panel" onClick={() => state.open ? close() : setState(s => ({ ...s, open: true }))}>
-      <span className="product-chat-launcher-avatar"><img src="/novia-office.webp" alt=""/><i aria-label="Online"/></span><span className="product-chat-launcher-label">Tanya Novia</span>
+      <span className="product-chat-launcher-avatar"><img src="/novia-avatar.webp" alt=""/><i aria-label="Online"/></span><span className="product-chat-launcher-label">Tanya Novia</span>
     </button>
   </div>;
 }
