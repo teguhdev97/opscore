@@ -127,8 +127,8 @@ export function ProductAssistant() {
         <small>{aiReady ? 'Saat dikirim, pesan dan riwayat terbatas diteruskan ke provider AI. Jangan bagikan informasi rahasia.' : 'FAQ lokal, bukan AI generatif. Pesan baru tidak dikirim ke provider AI.'} {storageAvailable ? 'Riwayat tersimpan di browser ini.' : 'Riwayat hanya untuk sesi ini.'}</small>
       </form>
     </section>}
-    {profileOpen && <div className="product-chat-profile-backdrop" role="presentation" onClick={() => setProfileOpen(false)} onKeyDown={e => { if (e.key === 'Escape') setProfileOpen(false); }}>
-      <section className="product-chat-profile-view" role="dialog" aria-modal="true" aria-labelledby="product-chat-profile-title" onClick={e => e.stopPropagation()}>
+    {profileOpen && <div className="product-chat-profile-overlay" role="presentation" onClick={() => setProfileOpen(false)} onKeyDown={e => { if (e.key === 'Escape') setProfileOpen(false); }}>
+      <section className="product-chat-profile-view" role="dialog" aria-modal="false" aria-labelledby="product-chat-profile-title" onClick={e => e.stopPropagation()}>
         <button type="button" className="product-chat-profile-close" aria-label="Tutup foto profil" onClick={() => setProfileOpen(false)}><X size={22}/></button>
         <img className="product-chat-profile-image" src="/novia-avatar.webp" alt="Novia, asisten AI DokuresAI, menyapa dari kantor DokuresAI"/>
         <div className="product-chat-profile-footer">
