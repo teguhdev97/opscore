@@ -129,8 +129,8 @@ export function ProductAssistant() {
     </section>}
     {profileOpen && <div className="product-chat-profile-overlay" role="presentation" onClick={() => setProfileOpen(false)} onKeyDown={e => { if (e.key === 'Escape') setProfileOpen(false); }}>
       <section className="product-chat-profile-view" role="dialog" aria-modal="false" aria-labelledby="product-chat-profile-title" onClick={e => e.stopPropagation()}>
-        <button type="button" className="product-chat-profile-close" aria-label="Tutup foto profil" onClick={() => setProfileOpen(false)}><X size={22}/></button>
-        <img className="product-chat-profile-image" src="/novia-avatar.webp" alt="Novia, asisten AI DokuresAI, menyapa dari kantor DokuresAI"/>
+        <button type="button" className="product-chat-profile-close" aria-label="Tutup foto profil dan kembali ke chat" onClick={() => setProfileOpen(false)}><X size={22}/></button>
+        <img className="product-chat-profile-image" src="/novia-profile-panel.webp" alt="Novia melambaikan tangan di kantor DokuresAI"/>
         <div className="product-chat-profile-footer">
           <div><strong id="product-chat-profile-title">Novia</strong><span>Asisten AI DokuresAI</span><small><i/> Online</small></div>
           <button type="button" onClick={() => setProfileOpen(false)}>Kembali ke chat</button>
