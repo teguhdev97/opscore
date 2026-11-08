@@ -85,5 +85,5 @@ export function ProfileDropdown() {
 
 export function AccountProfile() {
   const account = getAccount();
-  return <section className="panel account-page"><h1>Profil akun</h1><p>Informasi akun yang sedang masuk ke OpsCore.</p><span className="account-avatar">{account.initials}</span><dl><dt>Nama tampilan</dt><dd>{account.name}</dd><dt>Email</dt><dd>{account.email || 'Belum tersedia'}</dd><dt>Peran</dt><dd>{account.role}</dd></dl><Link className="btn outline" to="/app/settings">Pengaturan workspace</Link></section>;
+  return <section className="panel account-page"><h1>Profil akun</h1><p>Informasi akun yang sedang masuk ke DokuresAI.</p><span className="account-avatar">{account.initials}</span><dl><dt>Nama tampilan</dt><dd>{account.name}</dd><dt>Email</dt><dd>{account.email || 'Belum tersedia'}</dd><dt>Peran</dt><dd>{account.role}</dd></dl><Link className="btn outline" to="/app/settings">Pengaturan workspace</Link></section>;
 }

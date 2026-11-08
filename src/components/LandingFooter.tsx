@@ -10,7 +10,7 @@ const groups = [
 export function LandingFooter() {
   return <footer className="landing-footer">
     <div className="landing-footer-top">
-      <div className="landing-footer-brand"><Link to="/" className="logo" aria-label="DokuresAI beranda"><img className="logo-mark-image" src="/dokuresai-mascot.svg" alt="" /><span className="logo-word">Dokures<span>AI</span></span></Link><p>Pengetahuan tim, terhubung dengan pekerjaan sehari-hari. Satu workspace untuk operasional manufaktur yang lebih terarah.</p><span className="footer-demo-label"><i/> Prototype interaktif</span></div>
+      <div className="landing-footer-brand"><Link to="/" className="logo" aria-label="DokuresAI beranda"><img className="logo-mark-image" src="/dokuresai-logo.png" alt="DokuresAI" /><span className="logo-word">Dokures<span>AI</span></span></Link><p>Pengetahuan tim, terhubung dengan pekerjaan sehari-hari. Satu workspace untuk operasional manufaktur yang lebih terarah.</p><span className="footer-demo-label"><i/> Prototype interaktif</span></div>
       {groups.map(group => <nav key={group.title} aria-label={'Footer ' + group.title}><h3>{group.title}</h3>{group.links.map(([label, href]) => <Link key={href} to={href}>{label}</Link>)}</nav>)}
       <nav aria-label="Footer tentang"><h3>Tentang</h3><a href="#platform">Platform</a><a href="#workflow">Cara kerja</a><a href="#benefits">Mengapa DokuresAI</a><a href="https://github.com/teguhdev97/opscore" target="_blank" rel="noreferrer">GitHub <ArrowUpRight size={14}/></a></nav>
     </div>
