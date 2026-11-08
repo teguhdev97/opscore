@@ -6,7 +6,7 @@ import { ArrowUpRight, ChevronUp, Send, Trash2, X } from 'lucide-react';
 import './product-assistant.css';
 
 type Message = { role: 'user' | 'assistant'; text: string; link?: string; label?: string; source?: 'ai' | 'faq' };
-type ChatState = { open: boolean; messages: Message[]; draft: string };
+type ChatState = { open: boolean; consented: boolean; messages: Message[]; draft: string };
 const storageKey = 'opscore-product-assistant-v1';
 const welcome: Message = { role: 'assistant', text: 'Halo, saya Novia, asisten DokuresAI. Saya bisa membantu mengenali fitur, menjelaskan alur demo, dan menunjukkan tempat mulai. Apa yang ingin kamu ketahui?' };
 const topics = [
@@ -33,14 +33,15 @@ function loadState(): ChatState {
     const saved = JSON.parse(localStorage.getItem(storageKey) || 'null');
     if (saved && typeof saved.open === 'boolean' && Array.isArray(saved.messages)) {
       const messages: Message[] = saved.messages.filter((m: Message) => m && ['user', 'assistant'].includes(m.role) && typeof m.text === 'string').slice(-60).map((m: Message) => ({ role: m.role, text: m.text, source: m.source === 'ai' ? 'ai' : 'faq', ...(typeof m.link === 'string' && /^\/app(?:\/|$)/.test(m.link) ? { link: m.link, label: m.label } : {}) }));
-      return { open: saved.open, messages: messages.length ? messages : [welcome], draft: typeof saved.draft === 'string' ? saved.draft.slice(0, 1000) : '' };
+      return { open: saved.open, consented: saved.consented === true, messages: messages.length ? messages : [welcome], draft: typeof saved.draft === 'string' ? saved.draft.slice(0, 1000) : '' };
     }
   } catch { /* Storage may be unavailable or from an older version. */ }
-  return { open: false, messages: [welcome], draft: '' };
+  return { open: false, consented: false, messages: [welcome], draft: '' };
 }
 export function ProductAssistant() {
   const [state, setState] = useState<ChatState>(loadState);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [endChatOpen, setEndChatOpen] = useState(false);
   const [storageAvailable, setStorageAvailable] = useState(true);
   const [showScroll, setShowScroll] = useState(false);
   const [pending, setPending] = useState(false);
@@ -77,8 +78,10 @@ export function ProductAssistant() {
   function clear() {
     request.current?.abort(); request.current = null;
     setPending(false); setError(''); lastQuestion.current = '';
-    setState(s => ({ ...s, messages: [welcome], draft: '' }));
+    setEndChatOpen(false);
+    setState(s => ({ ...s, consented: false, messages: [welcome], draft: '' }));
   }
+  function agreeToChat() { setState(s => ({ ...s, consented: true })); }
   async function send(question = state.draft, retry = false) {
     const text = question.trim().slice(0, 1000);
     if (!text || request.current) return;
@@ -112,9 +115,10 @@ export function ProductAssistant() {
       <header className="product-chat-header">
         <button type="button" className="product-chat-avatar-button" aria-label="Lihat foto profil Novia" onClick={() => setProfileOpen(true)}><span className="product-chat-avatar"><img src="/novia-avatar.webp" alt=""/><i aria-label="Online"/></span></button>
         <div><h2 id="product-chat-title">Novia</h2><span className="product-chat-presence"><i/>Asisten AI DokuresAI · Online</span></div>
-        <button aria-label="Hapus percakapan" title="Hapus percakapan" onClick={clear}><Trash2 size={18}/></button>
+        <button aria-label="Hapus percakapan" title="Hapus percakapan" onClick={() => setEndChatOpen(true)}><Trash2 size={18}/></button>
         <button aria-label="Tutup chatbot" onClick={close}><X size={21}/></button>
       </header>
+      {!state.consented ? <div className="product-chat-consent"><span className="product-chat-consent-avatar"><img src="/novia-avatar.webp" alt=""/></span><span className="product-chat-private">● Obrolan pribadi</span><h3>Yuk, mulai dari<br/>kebutuhanmu.</h3><p>Ceritakan fitur atau kendala operasional yang sedang kamu hadapi.</p><ul><li>Novia membantu menjawab satu pertanyaan setiap giliran.</li><li>Kamu dapat menemukan fitur dan alur DokuresAI.</li><li>Kamu bebas menutup atau menghapus obrolan kapan pun.</li></ul><small>Riwayat percakapan tersimpan di browser ini.</small><button type="button" className="product-chat-agree" onClick={agreeToChat}>Setuju, mulai ngobrol <ArrowUpRight size={20}/></button><span className="product-chat-consent-note">Persetujuan obrolan terpisah dari persetujuan analitik.</span></div> : <>
       <div className="product-chat-mode"><span/> {aiReady ? 'AI produk · Pengetahuan DokuresAI' : status.isFetching ? 'Memeriksa koneksi · FAQ tersedia' : 'FAQ lokal · AI belum terhubung'}</div>
       <div className="product-chat-messages" ref={messages} role="log" aria-live="polite" aria-label="Percakapan bantuan produk">
         {state.messages.map((message, index) => <div key={index} className={'product-chat-message ' + message.role}><p>{message.text}</p>{message.role === 'assistant' && message.source && <small className="product-chat-source">{message.source === 'ai' ? 'Jawaban AI · Periksa kembali informasi penting' : 'FAQ produk'}</small>}{message.link && <Link to={message.link}>{message.label}<ArrowUpRight size={14}/></Link>}</div>)}
@@ -126,11 +130,13 @@ export function ProductAssistant() {
         <div><input ref={input} aria-label="Pertanyaan untuk Novia" placeholder="Tanya Novia…" maxLength={1000} value={state.draft} onChange={e => setState(s => ({ ...s, draft: e.target.value }))}/><button type="submit" aria-label="Kirim pertanyaan" disabled={!state.draft.trim() || pending || Boolean(error)}><Send size={20}/></button></div>
         <small>{aiReady ? 'Saat dikirim, pesan dan riwayat terbatas diteruskan ke provider AI. Jangan bagikan informasi rahasia.' : 'FAQ lokal, bukan AI generatif. Pesan baru tidak dikirim ke provider AI.'} {storageAvailable ? 'Riwayat tersimpan di browser ini.' : 'Riwayat hanya untuk sesi ini.'}</small>
       </form>
+      </>}
+      {endChatOpen && <div className="product-chat-end-overlay" role="presentation" onClick={() => setEndChatOpen(false)}><section className="product-chat-end-dialog" role="dialog" aria-modal="true" aria-labelledby="product-chat-end-title" onClick={e => e.stopPropagation()}><h3 id="product-chat-end-title">Hapus percakapan?</h3><p>Percakapan ini akan dihapus dari tampilan dan kamu akan kembali ke halaman persetujuan chat.</p><div><button type="button" onClick={() => setEndChatOpen(false)}>Batal</button><button type="button" className="danger" onClick={clear}>Hapus chat</button></div></section></div>}
     </section>}
     {profileOpen && <div className="product-chat-profile-overlay" role="presentation" onClick={() => setProfileOpen(false)} onKeyDown={e => { if (e.key === 'Escape') setProfileOpen(false); }}>
       <section className="product-chat-profile-view" role="dialog" aria-modal="false" aria-labelledby="product-chat-profile-title" onClick={e => e.stopPropagation()}>
         <button type="button" className="product-chat-profile-close" aria-label="Tutup foto profil dan kembali ke chat" onClick={() => setProfileOpen(false)}><X size={22}/></button>
-        <img className="product-chat-profile-image" src="/novia-profile-panel.webp" alt="Novia melambaikan tangan di kantor DokuresAI"/>
+        <img className="product-chat-profile-image" src="/novia-profile-panel.png" alt="Novia melambaikan tangan di kantor DokuresAI"/>
         <div className="product-chat-profile-footer">
           <div><strong id="product-chat-profile-title">Novia</strong><span>Asisten AI DokuresAI</span><small><i/> Online</small></div>
           <button type="button" onClick={() => setProfileOpen(false)}>Kembali ke chat</button>
@@ -138,8 +144,8 @@ export function ProductAssistant() {
       </section>
     </div>}
     {showScroll && <button className="product-chat-scroll-top" aria-label="Kembali ke atas" onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })}><ChevronUp size={20} strokeWidth={2.25}/></button>}
-    <button ref={launcher} className="product-chat-launcher" aria-label={state.open ? 'Tutup chat Novia' : 'Tanya Novia'} aria-expanded={state.open} aria-controls="product-chat-panel" onClick={() => state.open ? close() : setState(s => ({ ...s, open: true }))}>
-      <span className="product-chat-launcher-avatar"><img src="/novia-avatar.webp" alt=""/><i aria-label="Online"/></span><span className="product-chat-launcher-label">Tanya Novia</span>
+    <button ref={launcher} className={'product-chat-launcher' + (state.open ? ' is-open' : '')} aria-label={state.open ? 'Tutup chat Novia' : 'Tanya Novia'} aria-expanded={state.open} aria-controls="product-chat-panel" onClick={() => state.open ? close() : setState(s => ({ ...s, open: true }))}>
+      {state.open ? <X size={25} aria-hidden="true"/> : <><span className="product-chat-launcher-avatar"><img src="/novia-avatar.webp" alt=""/><i aria-label="Online"/></span><span className="product-chat-launcher-label">Tanya Novia</span></>}
     </button>
   </div>;
 }
