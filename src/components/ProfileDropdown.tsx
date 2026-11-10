@@ -17,7 +17,19 @@ export function getAccount() {
 
 type Theme = 'light' | 'dark' | 'system';
 
-export function ProfileDropdown() {
+const roleLabels: Record<string, string> = {
+  super_admin: 'Super Admin',
+  admin: 'Admin',
+  workspace_admin: 'Workspace Admin',
+  approver: 'Approver',
+  member: 'Member',
+};
+
+export function getRoleLabel(role: string): string {
+  return roleLabels[role] || role;
+}
+
+export function ProfileDropdown({ canAccessSettings }: { canAccessSettings: boolean }) {
   const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState<Theme>(() => {
     const saved = localStorage.getItem('opscore-theme');
@@ -67,10 +79,10 @@ export function ProfileDropdown() {
     </button>
     {open && <section id="account-dropdown-panel" className="account-panel" aria-label={english ? 'Account menu' : 'Menu akun'}>
       <div className="account-summary"><span className="account-avatar">{account.initials}</span><div><strong>{account.name}</strong><span>{account.email}</span></div></div>
-      <p className="account-role">{account.role === 'admin' ? 'Admin' : english ? 'User' : 'Pengguna'} <span>· {english ? 'Workspace access' : 'Akses workspace'}</span></p>
+      <p className="account-role">{getRoleLabel(account.role)} <span>· {english ? 'Workspace access' : 'Akses workspace'}</span></p>
       <div className="account-group">
         <Link ref={firstLink} to="/app/profile"><UserRound size={20}/>{english ? 'Profile' : 'Profil'}</Link>
-        <Link to="/app/settings"><Settings size={20}/>{english ? 'Settings' : 'Pengaturan'}</Link>
+        {canAccessSettings && <Link to="/app/settings"><Settings size={20}/>{english ? 'Settings' : 'Pengaturan'}</Link>}
       </div>
       <fieldset className="account-options"><legend>{english ? 'Theme' : 'Tema'}</legend>
         {([{ value: 'light', icon: Sun, label: english ? 'Light' : 'Terang' }, { value: 'dark', icon: Moon, label: english ? 'Dark' : 'Gelap' }, { value: 'system', icon: Monitor, label: english ? 'System' : 'Sistem' }] as const).map(({ value, icon: Icon, label }) => <label key={value}><input type="radio" name="account-theme" value={value} checked={theme === value} onChange={() => setTheme(value)}/><Icon size={20}/>{label}</label>)}
@@ -85,5 +97,5 @@ export function ProfileDropdown() {
 
 export function AccountProfile() {
   const account = getAccount();
-  return <section className="panel account-page"><h1>Profil akun</h1><p>Informasi akun yang sedang masuk ke DokuresAI.</p><span className="account-avatar">{account.initials}</span><dl><dt>Nama tampilan</dt><dd>{account.name}</dd><dt>Email</dt><dd>{account.email || 'Belum tersedia'}</dd><dt>Peran</dt><dd>{account.role}</dd></dl><Link className="btn outline" to="/app/settings">Pengaturan workspace</Link></section>;
+  return <section className="panel account-page"><h1>Profil akun</h1><p>Informasi akun yang sedang masuk ke DokuresAI.</p><span className="account-avatar">{account.initials}</span><dl><dt>Nama tampilan</dt><dd>{account.name}</dd><dt>Email</dt><dd>{account.email || 'Belum tersedia'}</dd><dt>Peran</dt><dd>{getRoleLabel(account.role)}</dd></dl><Link className="btn outline" to="/app/settings">Pengaturan workspace</Link></section>;
 }

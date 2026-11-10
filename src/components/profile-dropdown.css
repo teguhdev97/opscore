@@ -17,3 +17,15 @@ html[data-theme=dark] :is(.account-group a:hover,.account-group button:hover,.ac
 html[data-theme=dark] :is(.account-summary span:not(.account-avatar),.account-role span,.account-options legend,.account-group svg,.account-options svg){color:#a0aec3}
 html[data-theme=dark] :is(.sidebar nav a.active,.sidebar nav a:hover,.user:hover){background:#293954;color:#b6c4ff}
 html[data-theme=dark] .account-exit button,html[data-theme=dark] .account-exit svg{color:#ff9898}
+html[data-theme=dark] :is(.ask-banner,.stat-card){background:#1b263d;color:#e5eaf4;border-color:#344158}
+html[data-theme=dark] .ask-banner{background:linear-gradient(125deg,#1b263d,#202e49 72%,#1b263d)}
+html[data-theme=dark] .ask-banner h2{color:#e5eaf4}
+html[data-theme=dark] .ask-banner p{color:#a0aec3}
+html[data-theme=dark] .ask-banner .badge{color:#b6c4ff}
+html[data-theme=dark] .banner-orbit{border-color:#6179b7;color:#c4d2ff}
+html[data-theme=dark] .banner-orbit:before{content:'';position:absolute;top:17px;right:26px;width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fffde8,#ffe69a 55%,#f3bd55);box-shadow:0 0 10px 4px #ffe69a66,0 0 28px 10px #ffd36c36}
+html[data-theme=dark] .banner-orbit:after{border-color:#7890ce88}
+html[data-theme=dark] .stat-card{position:relative;overflow:hidden;background-image:radial-gradient(circle at 91% 79%,#b9c9ff 0 1px,transparent 1.8px),radial-gradient(circle at 83% 88%,#b9c9ff 0 1px,transparent 1.8px),radial-gradient(circle at 96% 91%,#b9c9ff 0 1px,transparent 1.8px)}
+html[data-theme=dark] .stat-card:after{content:'✦';position:absolute;right:28px;bottom:18px;color:#c5d2ff99;font-size:12px;pointer-events:none}
+html[data-theme=dark] .stat-card strong,html[data-theme=dark] .stat-card>span{color:#e5eaf4}
+html[data-theme=dark] .stat-card>small{color:#8ed6bd}

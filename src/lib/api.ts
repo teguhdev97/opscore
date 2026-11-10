@@ -20,6 +20,20 @@ export interface User {
   updated_at: string;
 }
 
+export interface DashboardMenu {
+  key: string;
+  path: string;
+  label: string;
+  icon: string;
+  permission: string;
+}
+
+export interface CurrentUserResponse {
+  user: User;
+  menus: DashboardMenu[];
+  permissions: string[];
+}
+
 class ApiClient {
   private token: string | null = null;
 
@@ -83,7 +97,7 @@ class ApiClient {
     return data;
   }
 
-  async getCurrentUser(): Promise<{ user: User }> {
+  async getCurrentUser(): Promise<CurrentUserResponse> {
     return this.request('/auth/me', { method: 'GET' });
   }
 

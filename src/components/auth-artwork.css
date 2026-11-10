@@ -1,0 +1,219 @@
+.auth-entry {
+  min-height: 100dvh;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.auth-entry .auth-brand {
+  height: 100dvh;
+  min-height: 0;
+  max-height: 100dvh;
+  gap: 28px;
+  padding: 42px clamp(32px, 5vw, 80px);
+  background: #192d78;
+  isolation: isolate;
+}
+
+.auth-entry .auth-brand > .logo,
+.auth-entry .auth-brand > p {
+  position: relative;
+  z-index: 1;
+}
+
+@media (min-width: 1025px) {
+  .auth-entry .auth-brand .logo-word { color: #f0f4ff; }
+}
+
+.auth-entry .auth-brand > p {
+  margin: 0;
+  color: #c6d3ff;
+}
+
+.auth-system {
+  width: min(100%, 520px);
+  margin: auto;
+}
+
+.auth-system-scene {
+  position: relative;
+  width: 150%;
+  margin-left: -25%;
+  aspect-ratio: 840 / 480;
+  isolation: isolate;
+  z-index: 1;
+}
+
+.auth-system-stars {
+  /* The positioned brand panel is the containing block for the night sky. */
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.auth-system-stars i {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  background: #eef4ff;
+  box-shadow: 0 0 5px #d7e6ff, 0 0 10px #adc7ff80;
+}
+.auth-system-stars i:nth-child(3n) { opacity: .5; }
+.auth-system-stars i:nth-child(3n + 1) { opacity: .8; }
+
+.auth-system-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: 75px;
+  aspect-ratio: 1;
+  overflow: visible;
+  isolation: isolate;
+  border: 1px solid #b8c8ff;
+  border-radius: 50%;
+  background: #6076d9;
+  box-shadow: 0 0 0 5px #ffe58a24, 0 0 18px 7px #ffd96655, 0 0 42px 12px #ffcf4a2e;
+}
+
+.auth-system-core::before {
+  position: absolute;
+  z-index: -1;
+  width: 145%;
+  height: 145%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 8deg,
+    transparent 0deg 12deg,
+    #ffe89a38 12deg 15deg,
+    transparent 15deg 42deg,
+    #ffe89a30 42deg 45deg,
+    transparent 45deg 72deg,
+    #ffe89a38 72deg 75deg,
+    transparent 75deg 102deg,
+    #ffe89a30 102deg 105deg,
+    transparent 105deg 132deg,
+    #ffe89a38 132deg 135deg,
+    transparent 135deg 162deg,
+    #ffe89a30 162deg 165deg,
+    transparent 165deg 192deg,
+    #ffe89a38 192deg 195deg,
+    transparent 195deg 222deg,
+    #ffe89a30 222deg 225deg,
+    transparent 225deg 252deg,
+    #ffe89a38 252deg 255deg,
+    transparent 255deg 282deg,
+    #ffe89a30 282deg 285deg,
+    transparent 285deg 312deg,
+    #ffe89a38 312deg 315deg,
+    transparent 315deg 342deg,
+    #ffe89a30 342deg 345deg,
+    transparent 345deg 360deg
+  );
+  content: "";
+  filter: blur(2px);
+}
+
+.auth-system-core img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.auth-system-orbits {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  stroke: #9eb7ff;
+  stroke-opacity: .65;
+  stroke-width: 1.5;
+}
+
+.auth-system-planet {
+  --planet-color: #dce5ff;
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  width: calc(4.5% - 2px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  color: #254d7b;
+  border: 1px solid #ffffff70;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 26%, color-mix(in srgb, var(--planet-color) 72%, white) 0%, var(--planet-color) 56%, color-mix(in srgb, var(--planet-color) 86%, #17254f) 100%);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--planet-color) 22%, transparent),
+    0 0 15px 5px color-mix(in srgb, var(--planet-color) 48%, transparent),
+    inset -3px -4px 8px #17254f26,
+    inset 2px 2px 6px #ffffff94;
+}
+
+.auth-system-planet svg { width: calc(47.5% - 2px); height: calc(47.5% - 2px); }
+.planet-checklist { --planet-color: #bde9dc; color: #164e3c; }
+.planet-pen { --planet-color: #e3d9ff; color: #553684; }
+.planet-folder { --planet-color: #ffdc9a; color: #6b3c0c; }
+.planet-workbuddy { --planet-color: #b5dbff; color: #184b7a; }
+.planet-star { --planet-color: #fff3b5; color: #785516; }
+
+.auth-entry-card { position: relative; margin-block: 42px; }
+.auth-card-avatar { display: none; }
+
+@media (max-width: 1024px) {
+  .auth-entry {
+    display: block;
+    padding: 28px 24px 96px;
+    background: #eef2ff;
+  }
+  .auth-entry .auth-brand {
+    display: block;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    padding: 0;
+    background: none;
+    overflow: visible;
+  }
+  .auth-entry .auth-brand > p { display: none !important; }
+  .auth-entry .auth-system { display: none; }
+  .auth-entry-card {
+    width: min(440px, 100%);
+    min-height: 0;
+    margin: 52px auto 0;
+    padding: 36px;
+  }
+}
+
+@media (max-width: 700px) {
+  .auth-entry { padding: 24px 20px 88px; }
+  .auth-entry-card {
+    margin-top: 88px;
+    padding: 76px 24px 28px;
+  }
+  .auth-card-avatar {
+    display: block;
+    position: absolute;
+    z-index: 1;
+    /* Account for the card's 1px border so the overlap is exactly half. */
+    top: -1px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 104px;
+    height: 104px;
+    margin: 0;
+    border: 6px solid #fff;
+    border-radius: 50%;
+    background: #fff2d4;
+    object-fit: cover;
+    box-shadow: 0 8px 24px #304c641c;
+  }
+  .auth-entry-card .auth-card-head h1 { font-size: clamp(23px, 6vw, 25px); }
+}
